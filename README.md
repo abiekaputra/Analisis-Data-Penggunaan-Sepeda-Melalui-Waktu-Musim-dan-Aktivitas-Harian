@@ -52,9 +52,6 @@ Proyek ini juga dapat diubah menjadi aplikasi interaktif menggunakan **Streamlit
    - Penggunaan sepeda lebih tinggi pada musim semi dan musim panas.
    - Pada hari kerja, jumlah pengguna sepeda lebih tinggi dibandingkan hari libur.
 
-2. **Pola Penggunaan Berdasarkan Waktu dalam Sehari**:
+2. **Pola Penggunaan Berdasarkan Waktu Jam dalam Sehari**:
    - Puncak penggunaan sepeda terjadi pada jam 8 pagi dan 5 sore, yang bertepatan dengan jam berangkat dan pulang kerja/sekolah.
    - Penggunaan sepeda berkurang di luar jam sibuk, terutama pada malam hari.
-
-3. **Hubungan Suhu dengan Penggunaan Sepeda**:
-   - Terdapat hubungan positif antara suhu dan jumlah pengguna sepeda, dengan peningkatan jumlah pengguna saat suhu nyaman.

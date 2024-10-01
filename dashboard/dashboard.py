@@ -6,12 +6,12 @@ import seaborn as sns
 # Judul dashboard
 st.title("Dashboard Analisis Data Penggunaan Sepeda: Waktu, Musim, dan Aktivitas Harian")
 
-# Data Wrangling
-st.header("1. Data Wrangling")
-
 # Memuat dataset (Data Gathering)
 day_data = pd.read_csv('data/day.csv')
 hour_data = pd.read_csv('data/hour.csv')
+
+# Bagian Data Wrangling
+st.header("1. Data Wrangling")
 
 # Menampilkan data mentah
 st.subheader("Raw Data")
@@ -45,46 +45,27 @@ if day_duplicates > 0:
     st.write(f"Ada {day_duplicates} duplikat di dataset 'day.csv'. Data akan dibersihkan.")
     day_data_cleaned = day_data.drop_duplicates()
 else:
+    day_data_cleaned = day_data.copy()
     st.write("Tidak ada duplikasi di dataset 'day.csv'.")
 
 if hour_duplicates > 0:
     st.write(f"Ada {hour_duplicates} duplikat di dataset 'hour.csv'. Data akan dibersihkan.")
     hour_data_cleaned = hour_data.drop_duplicates()
 else:
+    hour_data_cleaned = hour_data.copy()
     st.write("Tidak ada duplikasi di dataset 'hour.csv'.")
 
 # Menampilkan data yang sudah dibersihkan
 st.subheader("Data Setelah Dibersihkan")
 st.write("Dataset 'day.csv' yang sudah dibersihkan:")
-st.write(day_data_cleaned.head() if day_duplicates > 0 else day_data.head())
+st.write(day_data_cleaned.head())
 st.write("Dataset 'hour.csv' yang sudah dibersihkan:")
-st.write(hour_data_cleaned.head() if hour_duplicates > 0 else hour_data.head())
+st.write(hour_data_cleaned.head())
 
-# Exploratory Data Analysis (EDA)
-st.header("2. Exploratory Data Analysis (EDA)")
-
-# Visualisasi distribusi penggunaan sepeda per hari
-st.subheader("Distribusi Penggunaan Sepeda Per Hari")
-fig_dist, ax_dist = plt.subplots()
-sns.histplot(day_data['cnt'], kde=True, ax=ax_dist, color='purple')
-ax_dist.set_title('Distribusi Penggunaan Sepeda Per Hari')
-ax_dist.set_xlabel('Jumlah Pengguna')
-ax_dist.set_ylabel('Frekuensi')
-st.pyplot(fig_dist)
-
-# Korelasi antara variabel numerik
-st.subheader("Korelasi Antar Variabel Numerik")
-corr_matrix = day_data[['temp', 'atemp', 'hum', 'windspeed', 'cnt']].corr()
-
-fig_corr, ax_corr = plt.subplots()
-sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', ax=ax_corr)
-ax_corr.set_title('Matriks Korelasi Variabel')
-st.pyplot(fig_corr)
-
-# Sidebar
+# Sidebar Filters
 st.sidebar.header("Filters")
 
-# Checkbox untuk musim dengan label sesuai nama musim
+# Musim (Season) Filter
 spring = st.sidebar.checkbox('Semi', value=True)
 summer = st.sidebar.checkbox('Panas', value=True)
 fall = st.sidebar.checkbox('Gugur', value=True)
@@ -102,95 +83,120 @@ if fall:
 if winter:
     selected_seasons.append(4)
 
-# Checkbox untuk hari kerja dan libur
+# Hari Kerja dan Libur Filter
 st.sidebar.header("Pilih Hari Kerja dan Libur")
 is_working_day = st.sidebar.checkbox('Hari Kerja', value=True)
 is_holiday = st.sidebar.checkbox('Hari Libur', value=True)
 
-# Konversi pilihan checkbox ke format numerik
 working_day_value = []
 if is_holiday:
     working_day_value.append(0)
 if is_working_day:
     working_day_value.append(1)
 
-# Filter untuk jam dalam sehari
-hour_filter = st.sidebar.slider(
-    "Pilih Jam dalam Sehari",
-    min_value=int(hour_data['hr'].min()),
-    max_value=int(hour_data['hr'].max()),
-    value=(int(hour_data['hr'].min()), int(hour_data['hr'].max()))
-)
+# **Menghilangkan Filter Jam dalam Sehari**
+# Jadi, kita tidak lagi memerlukan slider untuk memilih jam
 
-# Filter data berdasarkan input pengguna
-filtered_day_data = day_data[day_data['season'].isin(selected_seasons)]
+# Filter data berdasarkan input pengguna (musim dan hari kerja/libur)
+filtered_day_data = day_data_cleaned[day_data_cleaned['season'].isin(selected_seasons)]
 filtered_day_data = filtered_day_data[filtered_day_data['workingday'].isin(working_day_value)]
-filtered_hour_data = hour_data[(hour_data['hr'] >= hour_filter[0]) & (hour_data['hr'] <= hour_filter[1])]
 
-# Visual Exploratory Analysis (VEA)
-st.header("3. Visual Exploratory Analysis (VEA)")
+# Karena kita menghilangkan filter jam, kita gunakan seluruh data untuk jam
+filtered_hour_data = hour_data_cleaned.copy()
 
-# Visualisasi 1: Rata-rata pengguna sepeda per musim
-st.subheader("Rata-rata Pengguna Sepeda Berdasarkan Musim Menggunakan Manual Grouping")
+# Exploratory Data Analysis (EDA)
+st.header("2. Visualization, Explanatory Analysis & Advanced Analysis")
+
+# Visualisasi distribusi penggunaan sepeda per hari
+st.subheader("Distribusi Penggunaan Sepeda Per Hari")
+plt.figure(figsize=(10, 6))
+hist_data = sns.histplot(filtered_day_data['cnt'], kde=True, color='#6495ED', edgecolor='black')
+
+heights = [p.get_height() for p in hist_data.patches]
+max_height = max(heights)
+max_height_index = heights.index(max_height)
+hist_data.patches[max_height_index].set_facecolor('#4169E1')
+
+plt.title('Distribusi Penggunaan Sepeda Per Hari', fontsize=14, fontweight='bold')
+plt.xlabel('Jumlah Pengguna', fontsize=12)
+plt.ylabel('Frekuensi', fontsize=12)
+st.pyplot(plt)
+
+# Matriks Korelasi
+st.subheader("Korelasi Antar Variabel Numerik")
+corr_matrix = filtered_day_data[['temp', 'atemp', 'hum', 'windspeed', 'cnt']].corr()
+plt.figure(figsize=(8, 6))
+sns.heatmap(corr_matrix, annot=True, cmap='coolwarm')
+plt.title('Matriks Korelasi Variabel', fontsize=14, fontweight='bold')
+st.pyplot(plt)
+
+# Rata-rata pengguna sepeda per musim dengan highlight balok tertinggi
+st.subheader("Visualisasi penggunaan sepeda per musim menggunakan manual grouping untuk menjawab pertanyaan 1")
 season_grouping = filtered_day_data.groupby('season')['cnt'].mean().reset_index()
 season_grouping['season'] = season_grouping['season'].map(season_map)
 
-fig1, ax1 = plt.subplots()
-ax1.bar(season_grouping['season'], season_grouping['cnt'], color='skyblue')
-ax1.set_title('Rata-rata Pengguna Berdasarkan Musim')
-ax1.set_xlabel('Musim')
-ax1.set_ylabel('Rata-rata Pengguna')
-st.pyplot(fig1)
+plt.figure(figsize=(8, 6))
+base_color = '#ADD8E6'
+highlight_color = '#4169E1'
+bars = sns.barplot(x='season', y='cnt', hue='season', data=season_grouping, palette=[base_color] * len(season_grouping), dodge=False, legend=False)
 
-# Visualisasi 2: Penggunaan sepeda pada hari kerja vs hari libur
-st.subheader("Penggunaan Sepeda pada Hari Kerja vs Libur Menggunakan Manual Grouping")
-working_day_grouping = day_data.groupby('workingday')['cnt'].mean().reset_index()
-working_day_grouping['workingday'] = working_day_grouping['workingday'].map({0: "Hari Libur", 1: "Hari Kerja"})
+heights = [bar.get_height() for bar in bars.patches]
+max_height = max(heights)
+for bar in bars.patches:
+    if bar.get_height() == max_height:
+        bar.set_facecolor(highlight_color)
 
-fig2, ax2 = plt.subplots()
-ax2.bar(working_day_grouping['workingday'], working_day_grouping['cnt'], color='lightblue')
-ax2.set_title('Rata-rata Pengguna pada Hari Kerja vs Libur')
-ax2.set_xlabel('Hari')
-ax2.set_ylabel('Rata-rata Pengguna')
-st.pyplot(fig2)
+plt.title('Rata-rata Pengguna Sepeda Berdasarkan Musim', fontsize=14, fontweight='bold')
+plt.xlabel('Musim', fontsize=12)
+plt.ylabel('Rata-rata Pengguna', fontsize=12)
+st.pyplot(plt)
 
-# Visualisasi 3: Penggunaan sepeda berdasarkan jam (dengan filter)
-st.subheader("Rata-rata Pengguna Sepeda Berdasarkan Jam Menggunakan Binning")
-# Bagian ini menggunakan binning untuk membagi data jam menjadi beberapa interval
-hour_grouping = filtered_hour_data.groupby('hr')['cnt'].mean().reset_index()
+# Penggunaan sepeda pada hari kerja vs libur
+st.subheader("Visualisasi penggunaan sepeda pada hari kerja dan libur menggunakan manual grouping untuk menjawab pertanyaan 1")
+working_day_grouping = filtered_day_data.groupby('workingday')['cnt'].mean().reset_index()
+working_day_grouping['workingday'] = working_day_grouping['workingday'].map({0: 'Hari Libur', 1: 'Hari Kerja'})
 
-fig3, ax3 = plt.subplots()
-ax3.plot(hour_grouping['hr'], hour_grouping['cnt'], marker='o', color='lightgreen')
-ax3.set_title('Rata-rata Pengguna Berdasarkan Jam')
-ax3.set_xlabel('Jam')
-ax3.set_ylabel('Rata-rata Pengguna')
-st.pyplot(fig3)
+plt.figure(figsize=(8, 6))
+base_color = '#ADD8E6'
+highlight_color = '#4682B4'
+bars = sns.barplot(x='workingday', y='cnt', data=working_day_grouping, hue='workingday', palette=[base_color, base_color], dodge=False)
 
-# Visualisasi 4: Rata-rata pengguna sepeda berdasarkan kondisi cuaca
-st.subheader("Rata-rata Pengguna Sepeda Berdasarkan Kondisi Cuaca Menggunakan Manual Grouping")
-weather_grouping = day_data.groupby('weathersit')['cnt'].mean().reset_index()
+heights = [bar.get_height() for bar in bars.patches]
+max_height = max(heights)
+for bar in bars.patches:
+    if bar.get_height() == max_height:
+        bar.set_color(highlight_color)
 
-fig4, ax4 = plt.subplots()
-ax4.bar(weather_grouping['weathersit'], weather_grouping['cnt'], color='salmon')
-ax4.set_title('Rata-rata Pengguna Berdasarkan Kondisi Cuaca')
-ax4.set_xlabel('Kondisi Cuaca')
-ax4.set_ylabel('Rata-rata Pengguna')
-ax4.set_xticks([1, 2, 3])
-ax4.set_xticklabels(['Cerah/Berawan', 'Berkabut/Berawan', 'Hujan Ringan/Salju'])
-st.pyplot(fig4)
+plt.title('Penggunaan Sepeda pada Hari Kerja vs Libur', fontsize=14, fontweight='bold')
+plt.xlabel('Hari', fontsize=12)
+plt.ylabel('Rata-rata Pengguna', fontsize=12)
+st.pyplot(plt)
 
-# Bagian 4: Analisis Lanjutan
-st.header("4. Analisis Lanjutan")
-st.write("""
-Pada bagian ini, kita akan melakukan analisis lebih lanjut seperti melihat pengaruh suhu terhadap penggunaan sepeda
-dan hubungan antara kondisi cuaca dengan perilaku pengguna.
-""")
+# Penggunaan sepeda berdasarkan jam
+st.subheader("Visualisasi penggunaan sepeda berdasarkan jam menggunakan binning untuk menjawab pertanyaan 2")
 
-# Analisis hubungan suhu dengan jumlah pengguna
-st.subheader("Hubungan Suhu dengan Penggunaan Sepeda")
-fig_temp, ax_temp = plt.subplots()
-sns.scatterplot(x='temp', y='cnt', data=day_data, ax=ax_temp)
-ax_temp.set_title('Hubungan Suhu dengan Penggunaan Sepeda')
-ax_temp.set_xlabel('Suhu')
-ax_temp.set_ylabel('Jumlah Pengguna')
-st.pyplot(fig_temp)
+hour_grouping = hour_data_cleaned.groupby('hr')['cnt'].mean().reset_index()
+hour_grouping = hour_grouping.sort_values('hr').reset_index(drop=True)
+hour_grouping['cnt_diff'] = hour_grouping['cnt'].diff()
+hour_grouping['cnt_diff'].fillna(0, inplace=True)
+
+top_increases = hour_grouping.nlargest(2, 'cnt_diff')
+
+# Mendapatkan jam dan nilai cnt pada lonjakan tertinggi
+peak_hours = top_increases['hr'].tolist()
+peak_values = top_increases['cnt'].tolist()
+
+# Plot rata-rata pengguna sepeda per jam
+plt.figure(figsize=(10, 6))
+sns.lineplot(x='hr', y='cnt', data=hour_grouping, marker='o', color='green')
+
+# Highlight pada dua lonjakan tertinggi
+for peak, peak_value in zip(peak_hours, peak_values):
+    plt.scatter(peak, peak_value, color='red', zorder=5, s=100)
+    plt.text(peak, peak_value + 10, f'{int(peak)}:00', color='red', fontsize=10, ha='center')
+
+plt.title('Rata-rata Pengguna Sepeda Berdasarkan Jam', fontsize=14, fontweight='bold')
+plt.xlabel('Jam', fontsize=12)
+plt.ylabel('Rata-rata Pengguna', fontsize=12)
+plt.grid(True, linestyle='--', alpha=0.6)
+st.pyplot(plt)
