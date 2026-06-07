@@ -1,57 +1,52 @@
-# Analisis Data Penggunaan Sepeda: Waktu, Musim, dan Aktivitas Harian 🚴‍♂️
+# Bike-Sharing Usage Pattern Analysis
 
-Proyek ini melakukan analisis mendalam tentang pola penggunaan sepeda berdasarkan berbagai faktor seperti **musim**, **hari kerja/libur**, dan **waktu dalam sehari**. Analisis ini menggunakan dataset dari penggunaan sepeda harian dan per jam. Proyek ini juga mencakup visualisasi interaktif menggunakan **Streamlit** serta analisis lebih lanjut terkait faktor suhu dan musim.
+In-depth analysis of bike-sharing usage patterns based on **season**, **workday vs. holiday**, and **time of day**. Includes exploratory data analysis (EDA), advanced trend analysis, and an interactive Streamlit dashboard.
 
-## Fitur Utama 🚀
+## Key Insights
 
-- **Exploratory Data Analysis (EDA)**: Menyediakan analisis eksploratif untuk mendapatkan pola umum dalam data, termasuk distribusi penggunaan sepeda dan korelasi antar variabel seperti suhu dan juml ah pengguna.
-- **Visualisasi Pola Penggunaan**: Menampilkan pola penggunaan sepeda berdasarkan musim, hari kerja/libur, dan waktu dalam sehari.
-- **Analisis Lanjutan**: Mengamati pengaruh suhu terhadap penggunaan sepeda, serta tren pengguna sepeda berdasarkan jam dan kondisi cuaca.
-- **Interaktif**: Pengguna dapat memfilter data berdasarkan musim dan hari kerja/libur untuk memeriksa pola yang lebih spesifik.
+1. **Season & Workday Patterns** — ridership peaks in spring and summer; weekdays consistently outperform weekends
+2. **Time-of-Day Peaks** — usage spikes at 8 AM and 5 PM, aligning with commuting hours; drops significantly at night
 
-## Struktur Proyek 📂
+## Features
 
-Proyek ini terdiri dari beberapa file dan direktori:
-- `notebook.ipynb`: Notebook Jupyter yang berisi analisis mendalam terkait pola penggunaan sepeda, data wrangling, EDA, serta analisis visual.
-- `data/`: Direktori yang berisi data penggunaan sepeda harian dan per jam.
-  - `day.csv`: Data penggunaan sepeda harian.
-  - `hour.csv`: Data penggunaan sepeda per jam.
-- `dashboard/`: Direktori yang berisi script python untuk menjalankan program.
-  - `dashboard.py`: File ini berisi kode untuk menjalankan dasbor interaktif menggunakan **Streamlit**.
-- `README.md`: File ini yang berisi penjelasan tentang proyek.
-- `url.txt`: File ini berisi tautan menuju deploy aplikasi Streamlit.
-- `requirements.txt`: Daftar pustaka Python yang diperlukan untuk menjalankan proyek.
+- **Exploratory Data Analysis (EDA)** — distribution, correlation, and outlier analysis across variables like temperature and weather
+- **Usage Pattern Visualization** — breakdown by season, workday/holiday, and hour of day
+- **Advanced Analysis** — temperature impact, seasonal trends, and weather condition effects
+- **Interactive Dashboard** — filter by season and workday to drill into specific patterns
 
-## Cara Menjalankan Proyek 💻
+## Project Structure
 
-### 1. Menjalankan Jupyter Notebook
-Untuk menjalankan analisis di **Jupyter Notebook**:
-1. Pastikan semua dependensi sudah terpasang dengan perintah berikut:
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. Jalankan Jupyter Notebook:
-   ```bash
-   jupyter notebook notebook.ipynb
-   ```
+```
+├── notebook.ipynb          # Full analysis: data wrangling, EDA, visualizations
+├── dashboard/
+│   └── dashboard.py        # Streamlit interactive dashboard
+├── data/
+│   ├── day.csv             # Daily bike-sharing data
+│   └── hour.csv            # Hourly bike-sharing data
+├── requirements.txt        # Python dependencies
+└── url.txt                 # Deployed Streamlit app link
+```
 
-### 2. Menjalankan Dasbor Streamlit
-Proyek ini juga dapat diubah menjadi aplikasi interaktif menggunakan **Streamlit**.
-1. Instal semua dependensi menggunakan:
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. Jalankan aplikasi Streamlit:
-   ```bash
-   streamlit run dashboard.py
-   ```
+## Getting Started
 
-## Insight Utama 📊
+```bash
+pip install -r requirements.txt
+```
 
-1. **Pola Penggunaan Berdasarkan Musim dan Hari Kerja/Libur**:
-   - Penggunaan sepeda lebih tinggi pada musim semi dan musim panas.
-   - Pada hari kerja, jumlah pengguna sepeda lebih tinggi dibandingkan hari libur.
+### Run Jupyter Notebook
 
-2. **Pola Penggunaan Berdasarkan Waktu Jam dalam Sehari**:
-   - Puncak penggunaan sepeda terjadi pada jam 8 pagi dan 5 sore, yang bertepatan dengan jam berangkat dan pulang kerja/sekolah.
-   - Penggunaan sepeda berkurang di luar jam sibuk, terutama pada malam hari.
+```bash
+jupyter notebook notebook.ipynb
+```
+
+### Run Streamlit Dashboard
+
+```bash
+streamlit run dashboard/dashboard.py
+```
+
+## Tech Stack
+
+- Python 3.x · Pandas · NumPy
+- Matplotlib · Seaborn
+- Streamlit
